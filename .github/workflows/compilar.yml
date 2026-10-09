@@ -29,6 +29,7 @@ jobs:
           - puntuales/10-persistencia-json
           - completos/01-arriendo-bicicletas
           - completos/02-biblioteca
+          - completos/03-veterinaria
     name: ${{ matrix.caso }}
     steps:
       - uses: actions/checkout@v4
