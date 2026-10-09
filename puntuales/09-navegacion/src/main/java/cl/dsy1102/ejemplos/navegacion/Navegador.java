@@ -3,6 +3,7 @@ package cl.dsy1102.ejemplos.navegacion;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -45,14 +46,29 @@ public final class Navegador {
     }
 
     /**
-     * TODO R4: abre la vista en una ventana MODAL nueva, duena de la principal.
-     *  1. Carga el FXML y obtiene su controlador.
-     *  2. Llama a preparar.accept(controlador) para entregarle datos ANTES de mostrarla.
-     *  3. Crea un Stage con initOwner(stage) e initModality(Modality.WINDOW_MODAL).
-     *  4. showAndWait(): el codigo se detiene aqui hasta que la ventana se cierre.
-     *  5. Retorna el controlador para que quien la abrio lea el resultado.
+     * Abre la vista en una ventana MODAL nueva, duena de la principal, y
+     * espera a que se cierre.
+     *
+     * @param preparar recibe el controlador ANTES de mostrar la ventana, para entregarle datos
+     * @return el controlador, para que quien abrio la ventana lea el resultado
      */
     public static <T> T abrirModal(String fxml, String titulo, Consumer<T> preparar) {
-        throw new UnsupportedOperationException("TODO R4: Navegador.abrirModal");
+        try {
+            FXMLLoader loader = new FXMLLoader(Navegador.class.getResource(RUTA_VISTAS + fxml));
+            Parent raiz = loader.load();
+            T controlador = loader.getController();
+            preparar.accept(controlador);
+
+            Stage modal = new Stage();
+            modal.initOwner(stage);                         // se centra y queda encima de la principal
+            modal.initModality(Modality.WINDOW_MODAL);      // bloquea la principal mientras este abierta
+            modal.setTitle(titulo);
+            modal.setResizable(false);
+            modal.setScene(new Scene(raiz));
+            modal.showAndWait();                            // el metodo se detiene aqui hasta cerrar
+            return controlador;
+        } catch (IOException e) {
+            throw new IllegalStateException("No se pudo cargar la vista " + fxml, e);
+        }
     }
 }

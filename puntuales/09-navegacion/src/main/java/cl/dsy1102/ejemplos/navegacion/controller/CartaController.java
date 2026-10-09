@@ -1,9 +1,11 @@
 package cl.dsy1102.ejemplos.navegacion.controller;
 
+import cl.dsy1102.ejemplos.navegacion.Navegador;
 import cl.dsy1102.ejemplos.navegacion.model.Carta;
 import cl.dsy1102.ejemplos.navegacion.model.Pedido;
 import cl.dsy1102.ejemplos.navegacion.model.Plato;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 
@@ -21,12 +23,17 @@ public class CartaController {
     @FXML
     private void initialize() {
         lstPlatos.getItems().setAll(Carta.platos());
-        // TODO R2: doble clic sobre un plato tambien abre su detalle.
+        // R2: doble clic sobre un plato tambien abre su detalle.
+        lstPlatos.setOnMouseClicked(evento -> {
+            if (evento.getClickCount() == 2 && lstPlatos.getSelectionModel().getSelectedItem() != null) {
+                onVerDetalle();
+            }
+        });
     }
 
     /**
-     * Ejemplo resuelto de paso de parametros: quien navega hacia esta vista
-     * llama a este metodo con el pedido en curso.
+     * Paso de parametros: quien navega hacia esta vista llama a este metodo
+     * con el pedido en curso.
      */
     public void inicializar(Pedido pedido) {
         this.pedido = pedido;
@@ -38,16 +45,21 @@ public class CartaController {
         lblMensaje.setText(mensaje);
     }
 
-    /**
-     * TODO R1: navega a detalle-view.fxml y entrega al DetalleController el
-     *  pedido y el plato seleccionado. Sin seleccion, muestra un Alert.
-     */
     @FXML
     private void onVerDetalle() {
+        Plato plato = lstPlatos.getSelectionModel().getSelectedItem();
+        if (plato == null) {
+            new Alert(Alert.AlertType.WARNING, "Selecciona un plato de la carta.").showAndWait();
+            return;
+        }
+        // navegar() retorna el controlador de la vista nueva: se le entregan los datos.
+        DetalleController detalle = Navegador.navegar("detalle-view.fxml", plato.getNombre());
+        detalle.inicializar(pedido, plato);
     }
 
-    /** TODO R3: navega a pedido-view.fxml entregando el pedido. */
     @FXML
     private void onVerPedido() {
+        PedidoController vista = Navegador.navegar("pedido-view.fxml", "Tu pedido");
+        vista.inicializar(pedido);
     }
 }
