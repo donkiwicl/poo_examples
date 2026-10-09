@@ -8,6 +8,10 @@ public class ContactoPersonal extends Contacto {
     private String apodo;
     private boolean favorito;
 
+    /** Para Jackson. */
+    protected ContactoPersonal() {
+    }
+
     public ContactoPersonal(String nombre, String telefono, String email, String apodo, boolean favorito) {
         super(nombre, telefono, email);
         setApodo(apodo);

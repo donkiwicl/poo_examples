@@ -1,17 +1,31 @@
 package cl.dsy1102.ejemplos.agenda.model;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * Contacto de la agenda. Es abstracta: siempre es personal o laboral.
  *
- * TODO R1: prepara la clase para Jackson.
- *  - Constructor sin parametros (protected) en esta clase y en cada subclase.
- *  - @JsonTypeInfo + @JsonSubTypes para que el JSON guarde "tipo": "PERSONAL" o "LABORAL".
+ * Jackson no puede crear una clase abstracta: con estas anotaciones escribe un
+ * atributo "tipo" en cada objeto del JSON y al leer lo usa para elegir la subclase.
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "tipo")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = ContactoPersonal.class, name = "PERSONAL"),
+        @JsonSubTypes.Type(value = ContactoLaboral.class, name = "LABORAL")
+})
 public abstract class Contacto {
 
     private String nombre;
     private String telefono;
     private String email;
+
+    /**
+     * Para Jackson: crea el objeto vacio y luego llama a los setters, de modo que
+     * las validaciones del modelo tambien se aplican al leer el archivo.
+     */
+    protected Contacto() {
+    }
 
     protected Contacto(String nombre, String telefono, String email) {
         setNombre(nombre);

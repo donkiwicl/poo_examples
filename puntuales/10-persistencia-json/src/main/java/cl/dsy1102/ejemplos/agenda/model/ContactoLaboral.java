@@ -8,6 +8,10 @@ public class ContactoLaboral extends Contacto {
     private String empresa;
     private String cargo;
 
+    /** Para Jackson. */
+    protected ContactoLaboral() {
+    }
+
     public ContactoLaboral(String nombre, String telefono, String email, String empresa, String cargo) {
         super(nombre, telefono, email);
         setEmpresa(empresa);
