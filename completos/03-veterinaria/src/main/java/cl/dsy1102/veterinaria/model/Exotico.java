@@ -13,6 +13,10 @@ public class Exotico extends Paciente {
 
     private String especie;
 
+    /** Para Jackson. */
+    protected Exotico() {
+    }
+
     public Exotico(String nombre, String tutor, String telefonoTutor, LocalDate fechaNacimiento, String especie) {
         super(nombre, tutor, telefonoTutor, fechaNacimiento);
         setEspecie(especie);
@@ -30,8 +34,9 @@ public class Exotico extends Paciente {
 
     @Override
     public Paciente copiar() {
-        Exotico copia = new Exotico(getNombre(), getTutor(), getTelefonoTutor(), getFechaNacimiento(), especie);
+        Exotico copia = new Exotico();
         copiarEn(copia);
+        copia.especie = especie;
         return copia;
     }
 

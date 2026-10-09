@@ -21,6 +21,10 @@ public class Atencion {
     private int costo;
     private String observacion;
 
+    /** Para Jackson: los campos privados se asignan directamente. */
+    protected Atencion() {
+    }
+
     Atencion(LocalDate fecha, TipoAtencion tipo, double pesoKg, int costo, String observacion) {
         if (pesoKg < PESO_MINIMO || pesoKg > PESO_MAXIMO) {
             throw new IllegalArgumentException("El peso debe estar entre 0,05 y 120 kg.");

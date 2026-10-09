@@ -9,6 +9,10 @@ public class Gato extends Paciente implements Vacunable {
 
     private boolean interior;
 
+    /** Para Jackson. */
+    protected Gato() {
+    }
+
     public Gato(String nombre, String tutor, String telefonoTutor, LocalDate fechaNacimiento, boolean interior) {
         super(nombre, tutor, telefonoTutor, fechaNacimiento);
         this.interior = interior;
@@ -31,8 +35,9 @@ public class Gato extends Paciente implements Vacunable {
 
     @Override
     public Paciente copiar() {
-        Gato copia = new Gato(getNombre(), getTutor(), getTelefonoTutor(), getFechaNacimiento(), interior);
+        Gato copia = new Gato();
         copiarEn(copia);
+        copia.interior = interior;
         return copia;
     }
 

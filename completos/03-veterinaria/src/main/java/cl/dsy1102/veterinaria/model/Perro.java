@@ -10,6 +10,10 @@ public class Perro extends Paciente implements Vacunable {
     private String raza;
     private Tamano tamano;
 
+    /** Para Jackson. */
+    protected Perro() {
+    }
+
     public Perro(String nombre, String tutor, String telefonoTutor, LocalDate fechaNacimiento, String raza, Tamano tamano) {
         super(nombre, tutor, telefonoTutor, fechaNacimiento);
         setRaza(raza);
@@ -33,8 +37,10 @@ public class Perro extends Paciente implements Vacunable {
 
     @Override
     public Paciente copiar() {
-        Perro copia = new Perro(getNombre(), getTutor(), getTelefonoTutor(), getFechaNacimiento(), raza, tamano);
+        Perro copia = new Perro();
         copiarEn(copia);
+        copia.raza = raza;
+        copia.tamano = tamano;
         return copia;
     }
 

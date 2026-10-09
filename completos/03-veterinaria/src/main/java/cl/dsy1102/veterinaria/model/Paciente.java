@@ -1,5 +1,10 @@
 package cl.dsy1102.veterinaria.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
@@ -11,7 +16,17 @@ import java.util.Locale;
 /**
  * Paciente de la clinica con su historial de atenciones (composicion: las
  * atenciones pertenecen al paciente y se guardan dentro de el en el JSON).
+ *
+ * Los getters calculados (edad, ultima atencion, peso actual, total y los dias
+ * entre vacunas de Vacunable) no se guardan: no tienen setter y romperian la lectura.
  */
+@JsonIgnoreProperties({"edadAnios", "ultimaAtencion", "pesoActual", "totalAtenciones", "diasEntreVacunas"})
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "tipo")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Perro.class, name = "PERRO"),
+        @JsonSubTypes.Type(value = Gato.class, name = "GATO"),
+        @JsonSubTypes.Type(value = Exotico.class, name = "EXOTICO")
+})
 public abstract class Paciente {
 
     private static final Locale CHILE = Locale.of("es", "CL");
@@ -22,7 +37,12 @@ public abstract class Paciente {
     private LocalDate fechaNacimiento;
 
     // Sin setter: solo crece con registrarAtencion(), que aplica las reglas.
+    @JsonProperty("atenciones")
     private List<Atencion> atenciones = new ArrayList<>();
+
+    /** Para Jackson: crea el objeto vacio y luego usa los setters (que validan). */
+    protected Paciente() {
+    }
 
     protected Paciente(String nombre, String tutor, String telefonoTutor, LocalDate fechaNacimiento) {
         setNombre(nombre);
