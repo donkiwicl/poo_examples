@@ -1,0 +1,13 @@
+# Movimientos del dia de la Cuenta Kiwi 1234-5 (saldo inicial $500.000)
+# Las lineas que empiezan con # y las lineas vacias se ignoran.
+
+DEPOSITAR 50000
+GIRAR 30000
+GIRAR abc
+GIRAR 900000
+GIRAR 150000
+GIRAR 60000
+DEPOSITAR -500
+VOLAR 10
+GIRAR
+SALDO
