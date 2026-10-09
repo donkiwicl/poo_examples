@@ -38,6 +38,7 @@ Aplicaciones de escritorio completas, **del tamaño de la tarea de la Fonda San 
 |---|---|---|
 | 01 | [Arriendo Cerro Alegre — bicicletas y scooters](completos/01-arriendo-bicicletas) | Estado que cambia y se persiste (disponible, batería), *template method*, copia antes de guardar, filtro con `CheckBox`. |
 | 02 | [Biblioteca Gabriela Mistral — préstamo de libros y revistas](completos/02-biblioteca) | Valores calculados que **no** deben ir al JSON, validación cruzada, `Spinner` con máximo polimórfico, `TextInputDialog`, filtro combinado. |
+| 03 | [Clínica Veterinaria Patitas del Sur — pacientes e historial clínico](completos/03-veterinaria) | **Enums con atributos**, **composición** (historial anidado en el JSON), **fechas** (`LocalDate`, `DatePicker`, `jackson-datatype-jsr310`), vista **maestro-detalle**. |
 
 Arquitectura común (MVC + Repository + DAO):
 
