@@ -19,11 +19,24 @@ public class Caja {
      * @throws IllegalArgumentException si el monto no es mayor que 0
      */
     public String cobrar(int monto, MedioPago medio) {
-        // TODO R3: valida el monto, calcula el total con el medio de pago,
-        //  acumula el total recaudado y, si el medio es Acumulable, sus puntos.
-        //  Registra la linea en boletas y retornala.
-        //  Prohibido: preguntar por la clase concreta (instanceof Efectivo, getClass()...).
-        return "";
+        if (monto <= 0) {
+            throw new IllegalArgumentException("El monto de la compra debe ser mayor que 0.");
+        }
+        // Polimorfismo: se ejecuta el calcularTotal() de la clase real del objeto.
+        int total = medio.calcularTotal(monto);
+        totalRecaudado += total;
+
+        String linea = medio.getNombre() + " | " + medio.getTitular()
+                + " | Compra: " + Formato.pesos(monto) + " | Total: " + Formato.pesos(total);
+
+        // Se pregunta por una capacidad (interfaz), no por una clase concreta.
+        if (medio instanceof Acumulable acumulable) {
+            int puntos = acumulable.calcularPuntos(total);
+            puntosOtorgados += puntos;
+            linea += " | Puntos: " + puntos;
+        }
+        boletas.add(linea);
+        return linea;
     }
 
     public List<String> getBoletas() {
