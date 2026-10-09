@@ -4,6 +4,7 @@ name: Compilar
 # - En main (codigo inicial) solo se compila: las pruebas de autoevaluacion
 #   fallan a proposito hasta que el estudiante resuelve el caso.
 # - En la rama solucion se ejecuta mvn verify: compila y corre las pruebas.
+#   Las pruebas de EA3 usan H2 en memoria: no necesitan un servidor MySQL.
 
 on:
   push:
@@ -30,6 +31,12 @@ jobs:
           - completos/01-arriendo-bicicletas
           - completos/02-biblioteca
           - completos/03-veterinaria
+          - ea3/parciales/01-conexion-jdbc
+          - ea3/parciales/02-consultas-resultset
+          - ea3/parciales/03-sentencias-parametrizadas
+          - ea3/parciales/04-transacciones
+          - ea3/parciales/05-refactor-dao-javafx
+          - ea3/general/almacen-don-kiwi
     name: ${{ matrix.caso }}
     steps:
       - uses: actions/checkout@v4

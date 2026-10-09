@@ -1,0 +1,37 @@
+[ {
+  "tipo" : "NO_PERECIBLE",
+  "id" : 1,
+  "codigo" : "AB-001",
+  "nombre" : "Arroz grado 1 1 kg",
+  "categoria" : "ABARROTES",
+  "precio" : 1490,
+  "stock" : 12,
+  "marca" : "Tucapel"
+}, {
+  "tipo" : "NO_PERECIBLE",
+  "id" : 2,
+  "codigo" : "AB-005",
+  "nombre" : "Lentejas 1 kg",
+  "categoria" : "ABARROTES",
+  "precio" : 2190,
+  "stock" : 14,
+  "marca" : "Wasil"
+}, {
+  "tipo" : "PERECIBLE",
+  "id" : 3,
+  "codigo" : "BE-003",
+  "nombre" : "Jugo de naranja 1 L",
+  "categoria" : "BEBIDAS",
+  "precio" : 1690,
+  "stock" : 9,
+  "fechaVencimiento" : "2027-03-31"
+}, {
+  "tipo" : "NO_PERECIBLE",
+  "id" : 4,
+  "codigo" : "LI-003",
+  "nombre" : "Lavalozas 750 ml",
+  "categoria" : "LIMPIEZA",
+  "precio" : 1390,
+  "stock" : 20,
+  "marca" : "Quix"
+} ]
