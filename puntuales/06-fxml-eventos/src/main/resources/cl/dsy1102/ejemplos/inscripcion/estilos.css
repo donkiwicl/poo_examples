@@ -1,0 +1,43 @@
+/* Estilos del taller. Se aplican con styleClass="..." en el FXML o
+   con getStyleClass().add(...) desde el controlador. */
+
+.vista {
+    -fx-padding: 20;
+    -fx-background-color: #fbf8f3;
+    -fx-font-size: 13px;
+}
+
+.titulo {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8a1c1c;
+}
+
+.subtitulo {
+    -fx-text-fill: #5b5b5b;
+}
+
+.grupo {
+    -fx-padding: 14;
+    -fx-background-color: white;
+    -fx-border-color: #e2dcd2;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.button.primario {
+    -fx-background-color: #8a1c1c;
+    -fx-text-fill: white;
+}
+
+.button.peligro {
+    -fx-text-fill: #b3261e;
+}
+
+.detalle {
+    -fx-padding: 10;
+    -fx-background-color: white;
+    -fx-border-color: #e2dcd2;
+}
+
+/* TODO R5: clase .campo-error (borde rojo) y clases .mensaje-ok / .mensaje-error para lblMensaje. */

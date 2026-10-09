@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Vista disenada en Scene Builder. fx:controller enlaza esta vista con su controlador. -->
+<BorderPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cl.dsy1102.ejemplos.inscripcion.InscripcionController"
+            stylesheets="@estilos.css" styleClass="vista">
+
+    <fx:define>
+        <!-- Agrupa los RadioButton: solo uno puede estar seleccionado. -->
+        <ToggleGroup fx:id="grpHorario"/>
+    </fx:define>
+
+    <top>
+        <VBox spacing="4">
+            <Label text="Taller de Cueca" styleClass="titulo"/>
+            <Label text="Centro Cultural Estación Yungay · Inscripciones" styleClass="subtitulo"/>
+            <BorderPane.margin><Insets bottom="16"/></BorderPane.margin>
+        </VBox>
+    </top>
+
+    <left>
+        <VBox spacing="12" styleClass="grupo" prefWidth="380">
+            <GridPane hgap="10" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="90"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+
+                <Label text="Nombre *" GridPane.rowIndex="0"/>
+                <TextField fx:id="txtNombre" promptText="Nombre y apellido" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                <Label text="Edad *" GridPane.rowIndex="1"/>
+                <TextField fx:id="txtEdad" promptText="Entre 8 y 99" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                <Label text="Nivel *" GridPane.rowIndex="2"/>
+                <ComboBox fx:id="cmbNivel" promptText="Selecciona" maxWidth="Infinity" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                <Label text="Horario *" GridPane.rowIndex="3"/>
+                <HBox spacing="16" GridPane.rowIndex="3" GridPane.columnIndex="1">
+                    <RadioButton fx:id="rbManana" text="Mañana" toggleGroup="$grpHorario"/>
+                    <RadioButton fx:id="rbTarde" text="Tarde" toggleGroup="$grpHorario"/>
+                </HBox>
+
+                <CheckBox fx:id="chkPareja" text="Viene con pareja" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                <Label text="Pareja" GridPane.rowIndex="5"/>
+                <TextField fx:id="txtPareja" promptText="Nombre de la pareja" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+            </GridPane>
+
+            <HBox spacing="8" alignment="CENTER_RIGHT">
+                <Button fx:id="btnInscribir" text="Inscribir" onAction="#onInscribir" defaultButton="true" styleClass="primario"/>
+            </HBox>
+            <Label fx:id="lblMensaje" wrapText="true"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="8">
+            <Label fx:id="lblTotal" text="Inscritos" styleClass="subtitulo"/>
+            <ListView fx:id="lstInscritos" VBox.vgrow="ALWAYS"/>
+            <Label fx:id="lblDetalle" text="Selecciona una inscripción para ver su detalle." wrapText="true" styleClass="detalle"
+                   maxWidth="Infinity" minHeight="-Infinity"/>
+            <HBox alignment="CENTER_RIGHT">
+                <Button fx:id="btnEliminar" text="Eliminar" onAction="#onEliminar" styleClass="peligro"/>
+            </HBox>
+            <BorderPane.margin><Insets left="16"/></BorderPane.margin>
+        </VBox>
+    </center>
+</BorderPane>
