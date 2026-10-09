@@ -1,0 +1,85 @@
+/* Estilos de Biblioteca Gabriela Mistral. */
+
+.vista {
+    -fx-padding: 20;
+    -fx-background-color: #f7f5ef;
+    -fx-font-size: 13px;
+}
+
+.titulo {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #5a3e8c;
+}
+
+.subtitulo {
+    -fx-font-size: 14px;
+    -fx-text-fill: #5b5b5b;
+}
+
+.grupo {
+    -fx-padding: 12;
+    -fx-background-color: white;
+    -fx-border-color: #e0dbea;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.button {
+    -fx-padding: 6 16;
+    -fx-cursor: hand;
+}
+
+.button.primario {
+    -fx-background-color: #5a3e8c;
+    -fx-text-fill: white;
+}
+
+.button.primario:hover {
+    -fx-background-color: #7052a8;
+}
+
+.button.peligro {
+    -fx-text-fill: #b3261e;
+}
+
+.table-column.numero {
+    -fx-alignment: CENTER_RIGHT;
+}
+
+.contador {
+    -fx-text-fill: #5b5b5b;
+}
+
+/* Campo marcado por la validacion del formulario. */
+.campo-error {
+    -fx-border-color: #b3261e;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 3;
+}
+
+.resultado {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.resultado-ok {
+    -fx-text-fill: #1e6b34;
+}
+
+.resultado-error {
+    -fx-text-fill: #b3261e;
+}
+
+.scroll-pane.sin-borde,
+.scroll-pane.sin-borde > .viewport {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+/* Materiales sin ejemplares disponibles. */
+.agotado {
+    -fx-text-fill: #b3261e;
+    -fx-font-weight: bold;
+}

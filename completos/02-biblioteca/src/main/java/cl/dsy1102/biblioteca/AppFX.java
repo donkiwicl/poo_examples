@@ -1,33 +1,56 @@
 package cl.dsy1102.biblioteca;
 
+import cl.dsy1102.biblioteca.controller.Alertas;
+import cl.dsy1102.biblioteca.controller.PrincipalController;
+import cl.dsy1102.biblioteca.dao.JsonMaterialDao;
+import cl.dsy1102.biblioteca.dao.PersistenciaException;
+import cl.dsy1102.biblioteca.model.Material;
+import cl.dsy1102.biblioteca.repository.Repository;
+import cl.dsy1102.biblioteca.repository.MaterialRepository;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+import java.nio.file.Path;
+
 /**
- * Punto de entrada de la aplicacion grafica.
+ * Punto de entrada de la aplicacion grafica. Ejecuta con: mvn javafx:run
  *
- * Revisa el enunciado en README.md. Ejecuta con: mvn javafx:run
+ * Es el unico lugar, junto al DAO, que conoce la ubicacion del archivo de datos.
  */
 public class AppFX extends Application {
 
+    private static final Path ARCHIVO_DATOS = Path.of("data", "materiales.json");
+
     @Override
     public void init() {
-        // TODO R1: trazar el ciclo de vida imprimiendo por consola.
+        System.out.println("[Ciclo de vida] init()  - hilo: " + Thread.currentThread().getName());
     }
 
     @Override
     public void start(Stage stage) {
-        // TODO R6: crear el DAO JSON y el repositorio de materiales, y cargar los datos.
-        //          Si la carga falla, informar con un Alert y continuar con la lista vacia.
-        // TODO R8: cargar la vista principal (FXML) con el Navegador, entregarle el
-        //          repositorio a su controlador y mostrarla en el Stage recibido.
-        stage.setTitle("Biblioteca Gabriela Mistral");
+        System.out.println("[Ciclo de vida] start() - hilo: " + Thread.currentThread().getName());
+
+        // Se arman las capas: el controlador recibira solo la interfaz Repository.
+        Repository<Material> repositorio = new MaterialRepository(new JsonMaterialDao(ARCHIVO_DATOS));
+
+        Navegador.setStage(stage);
+        stage.setMinWidth(800);
+        stage.setMinHeight(500);
+        PrincipalController principal = Navegador.navegar("principal-view.fxml", "Biblioteca Gabriela Mistral");
+        principal.inicializar(repositorio);
         stage.show();
+
+        try {
+            repositorio.cargar();
+        } catch (PersistenciaException e) {
+            Alertas.error("No se pudieron cargar los datos", e.getMessage()
+                    + "\n\nLa aplicación iniciará sin materiales. Si registras cambios, el archivo se reemplazará.");
+        }
     }
 
     @Override
     public void stop() {
-        // TODO R1: trazar el cierre de la aplicacion.
+        System.out.println("[Ciclo de vida] stop()  - hilo: " + Thread.currentThread().getName());
     }
 
     public static void main(String[] args) {

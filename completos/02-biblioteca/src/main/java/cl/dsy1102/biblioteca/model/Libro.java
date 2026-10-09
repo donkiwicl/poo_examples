@@ -11,6 +11,10 @@ public class Libro extends Material {
     private String autor;
     private int paginas;
 
+    /** Para Jackson. */
+    protected Libro() {
+    }
+
     public Libro(String codigo, String titulo, int anio, int ejemplares, String autor, int paginas) {
         super(codigo, titulo, anio, ejemplares);
         setAutor(autor);
@@ -28,9 +32,16 @@ public class Libro extends Material {
     }
 
     @Override
+    public String obtenerTipo() {
+        return "Libro";
+    }
+
+    @Override
     public Material copiar() {
-        Libro copia = new Libro(getCodigo(), getTitulo(), getAnio(), getEjemplares(), autor, paginas);
+        Libro copia = new Libro();
         copiarEn(copia);
+        copia.autor = autor;
+        copia.paginas = paginas;
         return copia;
     }
 

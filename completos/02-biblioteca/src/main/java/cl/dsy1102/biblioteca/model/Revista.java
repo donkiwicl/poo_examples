@@ -1,5 +1,7 @@
 package cl.dsy1102.biblioteca.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Revista: se presta hasta 3 dias, la multa es de $100 por dia de atraso y
  * puede estar restringida a consulta en sala.
@@ -10,7 +12,14 @@ public class Revista extends Material implements ConsultaEnSala {
     public static final int MULTA_DIARIA = 100;
 
     private int numero;
+
+    // Sin setter: solo se restringe con restringirASala(). Jackson lo lee y escribe por el campo.
+    @JsonProperty("soloSala")
     private boolean soloSala;
+
+    /** Para Jackson. */
+    protected Revista() {
+    }
 
     public Revista(String codigo, String titulo, int anio, int ejemplares, int numero) {
         super(codigo, titulo, anio, ejemplares);
@@ -28,9 +37,15 @@ public class Revista extends Material implements ConsultaEnSala {
     }
 
     @Override
+    public String obtenerTipo() {
+        return "Revista";
+    }
+
+    @Override
     public Material copiar() {
-        Revista copia = new Revista(getCodigo(), getTitulo(), getAnio(), getEjemplares(), numero);
+        Revista copia = new Revista();
         copiarEn(copia);
+        copia.numero = numero;
         copia.soloSala = soloSala;
         return copia;
     }

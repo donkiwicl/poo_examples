@@ -1,12 +1,26 @@
 package cl.dsy1102.biblioteca.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import java.time.Year;
 import java.util.Locale;
 
 /**
  * Material de la coleccion. Contiene lo comun a libros y revistas, la regla
  * general de prestamo y de devolucion; cada subclase define su plazo y su multa.
+ *
+ * getDisponibles() y getDiasMaximos() son valores CALCULADOS: no se guardan en
+ * el JSON (no tienen setter y al leer Jackson no sabria que hacer con ellos).
  */
+@JsonIgnoreProperties({"disponibles", "diasMaximos"})
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "tipo")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Libro.class, name = "LIBRO"),
+        @JsonSubTypes.Type(value = Revista.class, name = "REVISTA")
+})
 public abstract class Material {
 
     public static final int MAXIMO_EJEMPLARES = 20;
@@ -19,8 +33,14 @@ public abstract class Material {
     private int anio;
     private int ejemplares;
 
-    // Sin setter publico: solo cambia al prestar o devolver.
+    // Sin setter publico: solo cambia al prestar o devolver. @JsonProperty indica
+    // explicitamente a Jackson que lea y escriba este campo privado.
+    @JsonProperty("prestados")
     private int prestados;
+
+    /** Para Jackson: crea el objeto vacio y luego usa los setters (que validan). */
+    protected Material() {
+    }
 
     protected Material(String codigo, String titulo, int anio, int ejemplares) {
         setCodigo(codigo);
@@ -34,6 +54,9 @@ public abstract class Material {
 
     /** Multa en pesos por devolver con atraso. */
     public abstract int calcularMulta(int diasAtraso);
+
+    /** "Libro" o "Revista", para mostrar en la tabla sin preguntar por la clase. */
+    public abstract String obtenerTipo();
 
     /** Copia independiente: permite aplicar un cambio y descartarlo si no se pudo guardar. */
     public abstract Material copiar();
@@ -85,7 +108,7 @@ public abstract class Material {
     }
 
     public String obtenerDetalle() {
-        return codigo + "\n"
+        return obtenerTipo() + " " + codigo + "\n"
                 + "\"" + titulo + "\" (" + anio + ")\n"
                 + "Disponibles: " + getDisponibles() + " de " + ejemplares;
     }
