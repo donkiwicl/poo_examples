@@ -12,6 +12,10 @@ public class Bicicleta extends Vehiculo {
     private String categoria;
     private boolean conCanasto;
 
+    /** Para Jackson. */
+    protected Bicicleta() {
+    }
+
     public Bicicleta(String codigo, String modelo, int tarifaHora, String categoria, boolean conCanasto) {
         super(codigo, modelo, tarifaHora);
         setCategoria(categoria);
@@ -25,9 +29,16 @@ public class Bicicleta extends Vehiculo {
     }
 
     @Override
+    public String obtenerTipo() {
+        return "Bicicleta";
+    }
+
+    @Override
     public Vehiculo copiar() {
-        Bicicleta copia = new Bicicleta(getCodigo(), getModelo(), getTarifaHora(), categoria, conCanasto);
+        Bicicleta copia = new Bicicleta();
         copiarEn(copia);
+        copia.categoria = categoria;
+        copia.conCanasto = conCanasto;
         return copia;
     }
 

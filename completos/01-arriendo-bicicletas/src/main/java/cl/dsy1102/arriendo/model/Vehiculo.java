@@ -1,11 +1,20 @@
 package cl.dsy1102.arriendo.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import java.util.Locale;
 
 /**
  * Vehiculo de la flota. Contiene lo comun a bicicletas y scooters y la regla
  * general de arriendo; cada subclase define su costo y puede agregar condiciones.
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "tipo")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Bicicleta.class, name = "BICICLETA"),
+        @JsonSubTypes.Type(value = ScooterElectrico.class, name = "SCOOTER")
+})
 public abstract class Vehiculo {
 
     public static final int MAXIMO_HORAS = 8;
@@ -18,8 +27,14 @@ public abstract class Vehiculo {
     private String modelo;
     private int tarifaHora;
 
-    // Sin setter publico: solo cambia al arrendar o devolver.
+    // Sin setter publico: solo cambia al arrendar o devolver. @JsonProperty indica
+    // explicitamente a Jackson que lea y escriba este campo privado.
+    @JsonProperty("disponible")
     private boolean disponible = true;
+
+    /** Para Jackson: crea el objeto vacio y luego usa los setters (que validan). */
+    protected Vehiculo() {
+    }
 
     protected Vehiculo(String codigo, String modelo, int tarifaHora) {
         setCodigo(codigo);
@@ -29,6 +44,9 @@ public abstract class Vehiculo {
 
     /** Costo de arrendar este vehiculo por la cantidad de horas indicada. */
     public abstract int calcularCosto(int horas);
+
+    /** "Bicicleta" o "Scooter", para mostrar en la tabla sin preguntar por la clase. */
+    public abstract String obtenerTipo();
 
     /** Copia independiente: permite aplicar un cambio y descartarlo si no se pudo guardar. */
     public abstract Vehiculo copiar();
@@ -70,7 +88,7 @@ public abstract class Vehiculo {
     }
 
     public String obtenerDetalle() {
-        return codigo + " - " + modelo + "\n"
+        return obtenerTipo() + " " + codigo + " - " + modelo + "\n"
                 + "Tarifa: " + pesos(tarifaHora) + " por hora\n"
                 + "Estado: " + (disponible ? "Disponible" : "Arrendado");
     }

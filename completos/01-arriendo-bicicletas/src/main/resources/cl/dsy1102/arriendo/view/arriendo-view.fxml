@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cl.dsy1102.arriendo.controller.ArriendoController"
+            stylesheets="@styles.css" styleClass="vista">
+    <top>
+        <Label fx:id="lblTitulo" text="Arrendar" styleClass="titulo">
+            <BorderPane.margin><Insets bottom="16"/></BorderPane.margin>
+        </Label>
+    </top>
+
+    <center>
+        <VBox spacing="16" maxWidth="560">
+            <Label fx:id="lblDetalle" styleClass="grupo" wrapText="true" maxWidth="Infinity" minHeight="-Infinity"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Horas:"/>
+                <TextField fx:id="txtHoras" prefWidth="80" promptText="1 a 8"/>
+                <Button fx:id="btnArrendar" text="Arrendar" onAction="#onArrendar" styleClass="primario" defaultButton="true"/>
+                <Label fx:id="lblCosto" styleClass="subtitulo"/>
+            </HBox>
+            <Label fx:id="lblResultado" wrapText="true" styleClass="resultado"/>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_RIGHT">
+            <Button fx:id="btnVolver" text="Volver" onAction="#onVolver" cancelButton="true"/>
+            <padding><Insets top="12"/></padding>
+        </HBox>
+    </bottom>
+</BorderPane>

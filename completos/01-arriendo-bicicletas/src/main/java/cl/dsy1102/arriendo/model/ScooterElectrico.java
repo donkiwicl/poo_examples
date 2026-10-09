@@ -12,6 +12,10 @@ public class ScooterElectrico extends Vehiculo implements Recargable {
     private int bateria;
     private int autonomiaKm;
 
+    /** Para Jackson. */
+    protected ScooterElectrico() {
+    }
+
     public ScooterElectrico(String codigo, String modelo, int tarifaHora, int bateria, int autonomiaKm) {
         super(codigo, modelo, tarifaHora);
         setBateria(bateria);
@@ -24,9 +28,16 @@ public class ScooterElectrico extends Vehiculo implements Recargable {
     }
 
     @Override
+    public String obtenerTipo() {
+        return "Scooter";
+    }
+
+    @Override
     public Vehiculo copiar() {
-        ScooterElectrico copia = new ScooterElectrico(getCodigo(), getModelo(), getTarifaHora(), bateria, autonomiaKm);
+        ScooterElectrico copia = new ScooterElectrico();
         copiarEn(copia);
+        copia.bateria = bateria;
+        copia.autonomiaKm = autonomiaKm;
         return copia;
     }
 
