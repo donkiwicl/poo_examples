@@ -5,19 +5,32 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- TODO R1: coordenadas del proyecto (GAV). Cambia la version a 1.0.0. -->
+    <!-- R1: coordenadas GAV. Identifican el artefacto en cualquier repositorio Maven:
+         cl.dsy1102.ejemplos:rut:1.0.0 -->
     <groupId>cl.dsy1102.ejemplos</groupId>
     <artifactId>rut</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
+
+    <name>04 Maven - Validador de RUT</name>
 
     <properties>
         <maven.compiler.release>25</maven.compiler.release>
-        <!-- TODO R2: fija la codificacion de los fuentes en UTF-8. -->
+        <!-- R2: sin esto Maven usa la codificacion del sistema y las tildes pueden romperse. -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Propiedades propias: se reutilizan con ${...} -->
+        <clase.principal>cl.dsy1102.ejemplos.rut.Main</clase.principal>
+        <junit.version>5.12.2</junit.version>
     </properties>
 
     <dependencies>
-        <!-- TODO R3: agrega JUnit Jupiter 5.12.2 solo para las pruebas. -->
+        <!-- R3: scope test = disponible en src/test, no en src/main ni en el JAR. -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -27,7 +40,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
             </plugin>
-            <!-- Versiones fijas para poder trabajar sin internet (mvn -o). -->
+            <!-- Versiones fijas de los plugins del ciclo de vida: las que trae Maven por
+                 defecto son antiguas (surefire 2.12 no detecta JUnit 5). -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
@@ -38,9 +52,35 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.3.1</version>
             </plugin>
-            <!-- TODO R3: fija maven-surefire-plugin 3.5.4 (la version por defecto no detecta JUnit 5). -->
-            <!-- TODO R4: exec-maven-plugin para ejecutar con mvn exec:java -->
-            <!-- TODO R5: maven-jar-plugin con la clase principal en el MANIFEST -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.4</version>
+            </plugin>
+
+            <!-- R4: mvn compile exec:java -Dexec.args="12.345.678-5" -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <configuration>
+                    <mainClass>${clase.principal}</mainClass>
+                </configuration>
+            </plugin>
+
+            <!-- R5: mvn package genera target/rut-1.0.0.jar ejecutable con java -jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>${clase.principal}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
