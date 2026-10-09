@@ -1,0 +1,41 @@
+.vista {
+    -fx-padding: 20;
+    -fx-background-color: #f3f6fa;
+    -fx-font-size: 13px;
+}
+
+.titulo {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #12436b;
+}
+
+.table-column.numero {
+    -fx-alignment: CENTER_RIGHT;
+}
+
+.table-column.puntos {
+    -fx-font-weight: bold;
+}
+
+.button.primario {
+    -fx-background-color: #12436b;
+    -fx-text-fill: white;
+}
+
+.button.peligro {
+    -fx-text-fill: #b3261e;
+}
+
+.contador {
+    -fx-text-fill: #5b5b5b;
+}
+
+/* Colores de la columna DIF (R6). */
+.dif-positiva {
+    -fx-text-fill: #1e6b34;
+}
+
+.dif-negativa {
+    -fx-text-fill: #b3261e;
+}
