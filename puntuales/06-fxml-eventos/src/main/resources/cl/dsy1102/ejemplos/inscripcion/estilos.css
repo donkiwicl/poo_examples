@@ -40,4 +40,18 @@
     -fx-border-color: #e2dcd2;
 }
 
-/* TODO R5: clase .campo-error (borde rojo) y clases .mensaje-ok / .mensaje-error para lblMensaje. */
+/* Campo marcado por la validacion. */
+.campo-error {
+    -fx-border-color: #b3261e;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 3;
+}
+
+.mensaje-ok {
+    -fx-text-fill: #1e6b34;
+    -fx-font-weight: bold;
+}
+
+.mensaje-error {
+    -fx-text-fill: #b3261e;
+}

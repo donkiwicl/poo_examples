@@ -63,6 +63,7 @@
             </GridPane>
 
             <HBox spacing="8" alignment="CENTER_RIGHT">
+                <Button fx:id="btnLimpiar" text="Limpiar" onAction="#onLimpiar" cancelButton="true"/>
                 <Button fx:id="btnInscribir" text="Inscribir" onAction="#onInscribir" defaultButton="true" styleClass="primario"/>
             </HBox>
             <Label fx:id="lblMensaje" wrapText="true"/>
