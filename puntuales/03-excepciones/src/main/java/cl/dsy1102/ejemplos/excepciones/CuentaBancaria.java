@@ -40,22 +40,35 @@ public class CuentaBancaria {
     /**
      * Gira dinero de la cuenta.
      *
-     * TODO R2: implementa las reglas en este orden y agrega "throws" a la firma.
-     *  1. monto <= 0                              -> IllegalArgumentException
-     *  2. monto > saldo                           -> SaldoInsuficienteException
-     *  3. giradoHoy + monto > LIMITE_GIRO_DIARIO  -> LimiteDiarioExcedidoException
-     *  Si todo esta bien, descuenta el saldo y suma a giradoHoy.
+     * @throws IllegalArgumentException       si el monto no es mayor que 0
+     * @throws SaldoInsuficienteException     si el saldo no alcanza
+     * @throws LimiteDiarioExcedidoException  si supera el limite de giro del dia
      */
-    public void girar(int monto) {
+    public void girar(int monto) throws OperacionRechazadaException {
+        if (monto <= 0) {
+            throw new IllegalArgumentException("El monto debe ser mayor que 0");
+        }
+        if (monto > saldo) {
+            throw new SaldoInsuficienteException(monto - saldo);
+        }
+        if (giradoHoy + monto > LIMITE_GIRO_DIARIO) {
+            throw new LimiteDiarioExcedidoException(LIMITE_GIRO_DIARIO - giradoHoy);
+        }
+        // Solo se modifica el estado cuando todas las reglas se cumplen.
+        saldo -= monto;
+        giradoHoy += monto;
     }
 
     /**
-     * Transfiere a otra cuenta. Si el giro falla, el destino no recibe nada.
-     *
-     * TODO R3: destino null o igual a esta cuenta -> IllegalArgumentException.
-     *  Luego gira de esta cuenta y deposita en el destino.
+     * Transfiere a otra cuenta. Si el giro falla, el destino no recibe nada:
+     * la excepcion interrumpe el metodo antes de depositar.
      */
-    public void transferir(CuentaBancaria destino, int monto) {
+    public void transferir(CuentaBancaria destino, int monto) throws OperacionRechazadaException {
+        if (destino == null || destino == this) {
+            throw new IllegalArgumentException("La cuenta de destino no es valida");
+        }
+        girar(monto);
+        destino.depositar(monto);
     }
 
     public static String pesos(int monto) {
