@@ -1,0 +1,48 @@
+.vista {
+    -fx-padding: 20;
+    -fx-background-color: #fdf8f0;
+    -fx-font-size: 13px;
+}
+
+.titulo {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #7a3b12;
+}
+
+.barra-pedido {
+    -fx-padding: 8 12;
+    -fx-background-color: #f3e3cc;
+    -fx-background-radius: 6;
+}
+
+.grupo {
+    -fx-padding: 16;
+    -fx-background-color: white;
+    -fx-border-color: #eadbc4;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.precio {
+    -fx-font-size: 16px;
+}
+
+.subtotal {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.button.primario {
+    -fx-background-color: #7a3b12;
+    -fx-text-fill: white;
+}
+
+.mensaje-ok {
+    -fx-text-fill: #1e6b34;
+    -fx-font-weight: bold;
+}
+
+.mensaje-error {
+    -fx-text-fill: #b3261e;
+}
