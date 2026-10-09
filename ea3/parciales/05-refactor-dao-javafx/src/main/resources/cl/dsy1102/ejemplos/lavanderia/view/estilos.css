@@ -1,0 +1,64 @@
+/* Estilos de Lavandería La Burbuja. */
+
+.vista {
+    -fx-padding: 20;
+    -fx-background-color: #f2f7fb;
+    -fx-font-size: 13px;
+}
+
+.titulo {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1f5f8b;
+}
+
+.subtitulo {
+    -fx-font-size: 14px;
+    -fx-text-fill: #5b5b5b;
+}
+
+.grupo {
+    -fx-padding: 12;
+    -fx-background-color: white;
+    -fx-border-color: #d3e2ee;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.button {
+    -fx-padding: 6 14;
+    -fx-cursor: hand;
+}
+
+.button.primario {
+    -fx-background-color: #1f5f8b;
+    -fx-text-fill: white;
+}
+
+.button.primario:hover {
+    -fx-background-color: #2b78ad;
+}
+
+.button.peligro {
+    -fx-text-fill: #b3261e;
+}
+
+.table-column.numero {
+    -fx-alignment: CENTER_RIGHT;
+}
+
+.estado {
+    -fx-text-fill: #5b5b5b;
+}
+
+.estado-error {
+    -fx-text-fill: #b3261e;
+    -fx-font-weight: bold;
+}
+
+/* Campo marcado por la validación del formulario. */
+.campo-error {
+    -fx-border-color: #b3261e;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 3;
+}

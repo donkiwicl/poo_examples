@@ -1,6 +1,6 @@
 # Ejemplos de POO y JavaFX · DSY1102
 
-**DSY1102 · Programación Orientada a Objetos · Material de práctica para EA1 y EA2**
+**DSY1102 · Programación Orientada a Objetos · Material de práctica para EA1, EA2 y EA3**
 
 Casos **autoconclusivos**: cada carpeta es un proyecto Maven independiente, con su problema, su código inicial y su guía de resolución. Puedes abrir y resolver cualquiera sin haber hecho los anteriores.
 
@@ -47,6 +47,32 @@ Vista (FXML) → Controlador → Repository<T> → XxxRepository → XxxDao → 
                     └────────→ Modelo (reglas del negocio) ←────────┘
 ```
 
+## Grupo 3 · EA3: aplicaciones con base de datos
+
+Casos de la Experiencia de Aprendizaje 3 (JDBC con MySQL). Las **pruebas usan H2 en memoria en modo MySQL**, así que `mvn test` no necesita un servidor. Para ejecutar los programas sí se necesita MySQL 8: cada caso trae en `sql/` los scripts para crear su base de datos.
+
+### Casos parciales
+
+| # | Caso | Tema | Tipo |
+|---|---|---|---|
+| 01 | [Conexión JDBC — Camping Lago Ranco](ea3/parciales/01-conexion-jdbc) | Driver y `scope`, URL JDBC, `db.properties`, `ConexionBD`, diagnóstico de `SQLException`, `try-with-resources` | Consola + JUnit |
+| 02 | [Consultas y ResultSet — Liceo Bicentenario de Talca](ea3/parciales/02-consultas-resultset) | `JOIN`/`LEFT JOIN`, `GROUP BY`/`HAVING`, mapeo de filas a objetos, `NULL` y `wasNull`, fechas | Consola + JUnit |
+| 03 | [Sentencias parametrizadas — Club Deportivo Los Halcones](ea3/parciales/03-sentencias-parametrizadas) | `PreparedStatement`, inyección SQL, `LIKE` con parámetros, claves generadas, `UNIQUE` | Consola + JUnit |
+| 04 | [Transacciones — Cooperativa de Ahorro Los Andes](ea3/parciales/04-transacciones) | `commit`/`rollback`, una transacción = una conexión, `UPDATE` condicional, lotes | Consola + JUnit |
+| 05 | [Refactorización del DAO — Lavandería La Burbuja](ea3/parciales/05-refactor-dao-javafx) | Sacar el JDBC del controlador: interfaz DAO, `DaoException`, inyección de dependencias, `TableView` sincronizada, sin servidor | JavaFX + JUnit |
+
+### Caso general (tipo EP3)
+
+| Caso | Qué integra |
+|---|---|
+| [Almacén Don Kiwi — de JSON a MySQL](ea3/general/almacen-don-kiwi) | Migrar una aplicación de EA2 a MySQL **sin tocar sus controladores**, diseño de tablas (herencia en una tabla, FK), caja de ventas en **transacción**, **reportes** con `JOIN` y `GROUP BY`, migración de datos JSON → MySQL. |
+
+```
+Vista (FXML) → Controlador → Repository → XxxDao (interfaz) → JdbcXxxDao → ConexionBD → MySQL
+                                                                   ▲
+                                                            db.properties
+```
+
 ---
 
 ## Cómo trabajar
@@ -70,6 +96,7 @@ git checkout origin/solucion -- puntuales/02-polimorfismo/GUIA.md     # trae sol
 | JDK | 25 (LTS) |
 | Maven | 3.8 o superior (IntelliJ IDEA y NetBeans traen uno incorporado) |
 | Scene Builder | 25 o superior (opcional, recomendado para los casos con FXML) |
+| MySQL | 8.0 o superior (solo para ejecutar los casos de EA3; las pruebas no lo necesitan) |
 
 Si tu equipo solo tiene JDK 21, cambia en el `pom.xml` del caso `maven.compiler.release` a `21` y, en los casos JavaFX, `javafx.version` a `21.0.6`. La versión mayor de JavaFX debe coincidir con la del JDK.
 
@@ -82,7 +109,7 @@ mvn compile exec:java    # ejecuta un programa de consola
 mvn javafx:run           # ejecuta una aplicación JavaFX
 ```
 
-> La Evaluación Parcial 2 se rinde **sin internet**. Ejecuta cada caso al menos una vez con conexión para que Maven descargue las dependencias y los plugins a `~/.m2`. Después funcionan con `mvn -o`.
+> Las evaluaciones parciales se rinden **sin internet**. Ejecuta cada caso al menos una vez con conexión para que Maven descargue las dependencias y los plugins a `~/.m2`. Después funcionan con `mvn -o`.
 
 Cada push compila todos los casos en GitHub Actions. En `main` solo se compila y en `solucion` también se ejecutan las pruebas.
 

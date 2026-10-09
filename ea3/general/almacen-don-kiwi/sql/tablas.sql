@@ -1,0 +1,6 @@
+-- Paso 2: crea (o reinicia) las tablas.
+--   mysql -u root -p almacen_kiwi < sql/tablas.sql
+-- Las pruebas ejecutan este mismo archivo sobre H2.
+--
+-- TODO R2: escribe aquí el DROP TABLE IF EXISTS y el CREATE TABLE de
+-- producto, venta y detalle_venta, según el diseño del README.
