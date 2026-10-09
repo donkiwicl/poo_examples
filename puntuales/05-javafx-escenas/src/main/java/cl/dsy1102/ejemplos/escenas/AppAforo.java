@@ -6,7 +6,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -21,24 +24,32 @@ public class AppAforo extends Application {
 
     @Override
     public void init() {
-        // TODO R1: traza "[Ciclo de vida] init() - hilo: ..." con Thread.currentThread().getName()
+        // Corre en el hilo "JavaFX-Launcher": aun no existe la ventana.
+        System.out.println("[Ciclo de vida] init()  - hilo: " + Thread.currentThread().getName());
     }
 
     @Override
     public void start(Stage stage) {
-        // TODO R1: traza start() igual que init().
+        // Corre en el "JavaFX Application Thread". El Stage lo crea JavaFX.
+        System.out.println("[Ciclo de vida] start() - hilo: " + Thread.currentThread().getName());
         this.stage = stage;
         stage.setTitle("Ramada Los Copihues - Aforo");
+        stage.setMinWidth(360);
+        stage.setMinHeight(300);
         stage.setScene(crearEscenaBienvenida());
         stage.show();
     }
 
     @Override
     public void stop() {
-        // TODO R1: traza stop() e imprime cuantas personas quedaron dentro (si hay contador).
+        // Se ejecuta al cerrar la ultima ventana. Aqui se guardarian datos pendientes.
+        System.out.println("[Ciclo de vida] stop()  - hilo: " + Thread.currentThread().getName());
+        if (contador != null) {
+            System.out.println("Personas dentro al cerrar: " + contador.getPersonas());
+        }
     }
 
-    /** Ejemplo resuelto: escena inicial donde se ingresa el aforo maximo. */
+    /** Escena inicial donde se ingresa el aforo maximo. */
     private Scene crearEscenaBienvenida() {
         Label titulo = new Label("Control de aforo");
         titulo.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
@@ -70,19 +81,62 @@ public class AppAforo extends Application {
         return new Scene(raiz, 420, 320);
     }
 
-    /**
-     * TODO R2: escena del contador.
-     *  - BorderPane: arriba un titulo, al centro un VBox con el numero grande de
-     *    personas, una ProgressBar con la ocupacion y un Label de estado; abajo
-     *    un HBox con los botones "+ Entra", "- Sale" y "Volver".
-     *  - Cada boton modifica el Contador y llama a un metodo actualizar(...)
-     *    que refresca los textos y la barra.
-     *  - Con el aforo completo, "+ Entra" queda deshabilitado y el estado dice
-     *    "AFORO COMPLETO" en rojo.
-     *  - "Volver" regresa a la escena de bienvenida (R3).
-     */
+    /** Escena del contador: se crea de nuevo cada vez que se comienza. */
     private Scene crearEscenaContador() {
-        return new Scene(new Label("TODO: escena del contador"), 420, 320);
+        Label titulo = new Label("Aforo maximo: " + contador.getAforoMaximo());
+        titulo.setStyle("-fx-font-size: 16px;");
+
+        Label lblPersonas = new Label();
+        lblPersonas.setStyle("-fx-font-size: 64px; -fx-font-weight: bold;");
+        ProgressBar barra = new ProgressBar();
+        barra.setMaxWidth(Double.MAX_VALUE);
+        Label lblEstado = new Label();
+
+        Button btnEntra = new Button("+ Entra");
+        Button btnSale = new Button("- Sale");
+        Button btnVolver = new Button("Volver");
+
+        // Los botones solo hablan con el modelo; actualizar() refleja el modelo en la vista.
+        btnEntra.setOnAction(e -> {
+            contador.entrar();
+            actualizar(lblPersonas, barra, lblEstado, btnEntra, btnSale);
+        });
+        btnSale.setOnAction(e -> {
+            contador.salir();
+            actualizar(lblPersonas, barra, lblEstado, btnEntra, btnSale);
+        });
+        // Misma ventana (Stage), distinta escena (Scene).
+        btnVolver.setOnAction(e -> stage.setScene(crearEscenaBienvenida()));
+
+        VBox centro = new VBox(12, lblPersonas, barra, lblEstado);
+        centro.setAlignment(Pos.CENTER);
+        centro.setPadding(new Insets(0, 24, 0, 24));
+
+        HBox botones = new HBox(10, btnEntra, btnSale, btnVolver);
+        botones.setAlignment(Pos.CENTER);
+
+        BorderPane raiz = new BorderPane(centro);
+        raiz.setTop(titulo);
+        raiz.setBottom(botones);
+        BorderPane.setAlignment(titulo, Pos.CENTER);
+        raiz.setPadding(new Insets(20));
+
+        actualizar(lblPersonas, barra, lblEstado, btnEntra, btnSale);
+        return new Scene(raiz, 420, 320);
+    }
+
+    private void actualizar(Label lblPersonas, ProgressBar barra, Label lblEstado, Button btnEntra, Button btnSale) {
+        lblPersonas.setText(String.valueOf(contador.getPersonas()));
+        barra.setProgress(contador.getOcupacion());
+        btnEntra.setDisable(contador.estaCompleto());
+        btnSale.setDisable(contador.getPersonas() == 0);
+        if (contador.estaCompleto()) {
+            lblEstado.setText("AFORO COMPLETO");
+            lblEstado.setStyle("-fx-text-fill: #b3261e; -fx-font-weight: bold;");
+        } else {
+            lblEstado.setText("Quedan " + (contador.getAforoMaximo() - contador.getPersonas()) + " lugares");
+            lblEstado.setStyle("-fx-text-fill: #1e6b34;");
+        }
     }
 
     public static void main(String[] args) {
