@@ -1,5 +1,6 @@
 package cl.dsy1102.ejemplos.liga;
 
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -10,7 +11,14 @@ import java.util.List;
  */
 public class Liga {
 
-    private final ObservableList<Equipo> equipos = FXCollections.observableArrayList();
+    /**
+     * R7: el extractor indica que propiedades de cada equipo observa la lista.
+     * Cuando cambian, la lista emite un evento de actualizacion y la SortedList
+     * de la tabla vuelve a ordenar. Sin el, los puntos cambian pero el orden no.
+     */
+    private final ObservableList<Equipo> equipos = FXCollections.observableArrayList(equipo -> new Observable[]{
+            equipo.puntosBinding(), equipo.diferenciaBinding(), equipo.golesFavorProperty(),
+            equipo.nombreProperty(), equipo.comunaProperty()});
 
     public ObservableList<Equipo> getEquipos() {
         return equipos;
