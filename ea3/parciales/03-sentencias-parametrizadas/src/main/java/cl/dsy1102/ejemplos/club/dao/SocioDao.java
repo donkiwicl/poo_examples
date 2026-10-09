@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -49,52 +50,105 @@ public class SocioDao {
     }
 
     /**
-     * TODO R1: misma búsqueda con PreparedStatement. Sin distinguir mayúsculas
-     * ("tapia" encuentra a "Florencia Tapia"). Los % del LIKE van en el
-     * VALOR del parámetro, no en el SQL.
+     * Misma búsqueda que la insegura, con PreparedStatement. LOWER en ambos
+     * lados: MySQL compara sin distinguir mayúsculas, pero H2 y otros motores sí.
      */
     public List<Socio> buscarPorNombre(String texto) throws SQLException {
-        throw new UnsupportedOperationException("TODO R1");
+        String sql = "SELECT " + COLUMNAS + " FROM socio WHERE LOWER(nombre) LIKE LOWER(?) ORDER BY nombre";
+        try (Connection con = conexion.abrir();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            // Los comodines son parte del VALOR. "LIKE '%?%'" no funcionaría:
+            // dentro de comillas, ? es un carácter, no un parámetro.
+            ps.setString(1, "%" + texto + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                return mapearTodos(rs);
+            }
+        }
     }
 
     /**
-     * TODO R2: inserta el socio y le asigna el id generado por la base de datos
-     * (Statement.RETURN_GENERATED_KEYS y getGeneratedKeys()).
-     * Si el RUT ya existe, lanza SocioDuplicadoException("Ya existe un socio con el RUT <rut>.").
-     * Pista: el driver lanza SQLIntegrityConstraintViolationException.
+     * Inserta el socio y le asigna el id generado por la base de datos.
      */
     public void insertar(Socio socio) throws SocioDuplicadoException, SQLException {
-        throw new UnsupportedOperationException("TODO R2");
+        String sql = "INSERT INTO socio (rut, nombre, categoria, cuota_mensual, fecha_ingreso, activo)"
+                + " VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection con = conexion.abrir();
+             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, socio.getRut());
+            ps.setString(2, socio.getNombre());
+            ps.setString(3, socio.getCategoria().name());
+            ps.setInt(4, socio.getCuotaMensual());
+            ps.setObject(5, socio.getFechaIngreso());
+            ps.setBoolean(6, socio.isActivo());
+            ps.executeUpdate();
+            try (ResultSet claves = ps.getGeneratedKeys()) {
+                if (claves.next()) {
+                    socio.setId(claves.getInt(1)); // la clave generada no tiene nombre de columna fijo
+                }
+            }
+        } catch (SQLIntegrityConstraintViolationException e) {
+            // La única restricción que puede fallar en un INSERT de esta tabla es UNIQUE(rut):
+            // los NOT NULL y CHECK ya los protege el modelo.
+            throw new SocioDuplicadoException("Ya existe un socio con el RUT " + socio.getRut() + ".", e);
+        }
     }
 
     /**
-     * TODO R3: actualiza nombre, categoría, cuota y estado del socio con ese id.
-     * Retorna true si se modificó una fila; false si el id no existe.
+     * Actualiza nombre, categoría, cuota y estado. Retorna false si el id no existe.
      */
     public boolean actualizar(Socio socio) throws SQLException {
-        throw new UnsupportedOperationException("TODO R3");
+        String sql = "UPDATE socio SET nombre = ?, categoria = ?, cuota_mensual = ?, activo = ? WHERE id = ?";
+        try (Connection con = conexion.abrir();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, socio.getNombre());
+            ps.setString(2, socio.getCategoria().name());
+            ps.setInt(3, socio.getCuotaMensual());
+            ps.setBoolean(4, socio.isActivo());
+            ps.setInt(5, socio.getId()); // los parámetros se numeran por su posición en el SQL
+            return ps.executeUpdate() == 1;
+        }
     }
 
-    /** TODO R4: elimina por id. Retorna true si existía. */
+    /** Elimina por id. Retorna true si existía. */
     public boolean eliminar(int id) throws SQLException {
-        throw new UnsupportedOperationException("TODO R4");
+        try (Connection con = conexion.abrir();
+             PreparedStatement ps = con.prepareStatement("DELETE FROM socio WHERE id = ?")) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() == 1;
+        }
     }
 
     /**
-     * TODO R5: reajusta en un porcentaje (10 = +10 %) la cuota de los socios
-     * ACTIVOS de una categoría, redondeando al peso. Retorna cuántos socios
-     * cambiaron. Un solo UPDATE: no recorras los socios en Java.
+     * Reajusta en un porcentaje (10 = +10 %) la cuota de los socios activos de
+     * una categoría. Retorna cuántos socios cambiaron.
      */
     public int reajustarCuotas(Categoria categoria, double porcentaje) throws SQLException {
-        throw new UnsupportedOperationException("TODO R5");
+        // CAST: algunos motores (H2) deducen el tipo del ? a partir de la otra
+        // columna de la operación (INT) y truncarían 1.055 a 1.
+        String sql = "UPDATE socio SET cuota_mensual = ROUND(cuota_mensual * CAST(? AS DECIMAL(6,3)))"
+                + " WHERE categoria = ? AND activo = TRUE";
+        try (Connection con = conexion.abrir();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setDouble(1, 1 + porcentaje / 100);
+            ps.setString(2, categoria.name());
+            return ps.executeUpdate();
+        }
     }
 
     /**
-     * TODO R6: socios de una categoría que ingresaron desde la fecha indicada
-     * (inclusive), del más antiguo al más nuevo. Usa setObject para la fecha.
+     * Socios de una categoría que ingresaron desde la fecha indicada (inclusive).
      */
     public List<Socio> filtrar(Categoria categoria, LocalDate desde) throws SQLException {
-        throw new UnsupportedOperationException("TODO R6");
+        String sql = "SELECT " + COLUMNAS + " FROM socio WHERE categoria = ? AND fecha_ingreso >= ?"
+                + " ORDER BY fecha_ingreso, nombre";
+        try (Connection con = conexion.abrir();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, categoria.name());
+            ps.setObject(2, desde); // LocalDate -> DATE, sin pasar por texto
+            try (ResultSet rs = ps.executeQuery()) {
+                return mapearTodos(rs);
+            }
+        }
     }
 
     private List<Socio> mapearTodos(ResultSet rs) throws SQLException {

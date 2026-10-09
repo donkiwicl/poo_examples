@@ -55,6 +55,9 @@
             <Button fx:id="btnNuevo" text="Nuevo" onAction="#onNuevo" styleClass="primario" minWidth="-Infinity"/>
             <Button fx:id="btnEditar" text="Editar" onAction="#onEditar" minWidth="-Infinity"/>
             <Button fx:id="btnEliminar" text="Eliminar" onAction="#onEliminar" styleClass="peligro" minWidth="-Infinity"/>
+            <Pane prefWidth="16"/>
+            <Button fx:id="btnNuevaVenta" text="Nueva venta" onAction="#onNuevaVenta" styleClass="primario" minWidth="-Infinity"/>
+            <Button fx:id="btnReportes" text="Reportes" onAction="#onReportes" minWidth="-Infinity"/>
             <Pane HBox.hgrow="ALWAYS"/>
             <Label fx:id="lblTotal" styleClass="contador"/>
             <padding><Insets top="12"/></padding>

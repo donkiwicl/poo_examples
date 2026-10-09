@@ -7,6 +7,7 @@ import cl.dsy1102.almacen.model.Formato;
 import cl.dsy1102.almacen.model.Producto;
 import cl.dsy1102.almacen.model.ProductoPerecible;
 import cl.dsy1102.almacen.repository.Repository;
+import cl.dsy1102.almacen.repository.VentaRepository;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -44,6 +45,7 @@ public class PrincipalController {
     @FXML private Label lblTotal;
 
     private Repository<Producto> productos;
+    private VentaRepository ventas;
     private FilteredList<Producto> filtrados;
 
     @FXML
@@ -99,8 +101,9 @@ public class PrincipalController {
         });
     }
 
-    public void inicializar(Repository<Producto> productos) {
+    public void inicializar(Repository<Producto> productos, VentaRepository ventas) {
         this.productos = productos;
+        this.ventas = ventas;
 
         filtrados = new FilteredList<>(productos.listar(), producto -> true);
         txtBuscar.textProperty().addListener((obs, antes, texto) -> actualizarFiltro());
@@ -148,6 +151,18 @@ public class PrincipalController {
         } catch (PersistenciaException e) {
             Alertas.error("No se pudieron cargar los productos", e.getMessage());
         }
+    }
+
+    @FXML
+    private void onNuevaVenta() {
+        VentaController venta = Navegador.navegar("venta-view.fxml", "Nueva venta");
+        venta.inicializar(productos, ventas);
+    }
+
+    @FXML
+    private void onReportes() {
+        ReportesController reportes = Navegador.navegar("reportes-view.fxml", "Reportes de ventas");
+        reportes.inicializar(ventas);
     }
 
     private void abrirFormulario(Producto producto) {

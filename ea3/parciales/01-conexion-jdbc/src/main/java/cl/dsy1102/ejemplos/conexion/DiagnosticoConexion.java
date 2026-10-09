@@ -8,22 +8,29 @@ import java.sql.SQLException;
  */
 public final class DiagnosticoConexion {
 
+    private static final int ACCESO_DENEGADO = 1045;
+    private static final int BASE_DESCONOCIDA = 1049;
+
     private DiagnosticoConexion() {
     }
 
-    /**
-     * TODO R5: retorna un mensaje según el error. Usa getErrorCode(),
-     * getSQLState() y, solo para el driver, getMessage():
-     *
-     *  | Situación                         | Cómo se reconoce                         | Mensaje (debe contener)        |
-     *  |-----------------------------------|------------------------------------------|--------------------------------|
-     *  | Usuario o contraseña incorrectos  | código 1045 o SQLState "28000"           | "Usuario o contraseña"         |
-     *  | La base de datos no existe        | código 1049                              | "La base de datos no existe"   |
-     *  | No hay driver para la URL         | mensaje empieza con "No suitable driver" | "driver"                       |
-     *  | Servidor detenido o puerto malo   | SQLState que empieza con "08"            | "servidor"                     |
-     *  | Cualquier otro                    | -                                        | "código <n>: <mensaje>"        |
-     */
     public static String explicar(SQLException e) {
-        return e.getMessage();
+        String estado = e.getSQLState() == null ? "" : e.getSQLState();
+        String mensaje = e.getMessage() == null ? "" : e.getMessage();
+
+        if (e.getErrorCode() == ACCESO_DENEGADO || estado.equals("28000")) {
+            return "Usuario o contraseña incorrectos. Revisa db.usuario y db.clave en db.properties.";
+        }
+        if (e.getErrorCode() == BASE_DESCONOCIDA) {
+            return "La base de datos no existe. Ejecuta sql/camping.sql en tu servidor MySQL.";
+        }
+        if (mensaje.startsWith("No suitable driver")) {
+            return "No hay un driver JDBC para la URL. Revisa la dependencia mysql-connector-j en el pom.xml"
+                    + " y que db.url empiece con jdbc:mysql://";
+        }
+        if (estado.startsWith("08")) {
+            return "No se pudo contactar al servidor. Revisa que MySQL esté iniciado y el host y el puerto de db.url.";
+        }
+        return "Error de base de datos (código " + e.getErrorCode() + ": " + mensaje + ")";
     }
 }

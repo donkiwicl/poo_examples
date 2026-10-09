@@ -83,42 +83,136 @@ public class CuentaDao {
     }
 
     /**
-     * TODO R1 a R3: transfiere un monto entre dos cuentas como UNA transacción.
-     *
-     * Validaciones previas (sin tocar la base de datos):
-     *  - monto mayor que cero, si no IllegalArgumentException;
-     *  - origen distinto del destino, si no IllegalArgumentException.
-     *
-     * En la transacción (una sola Connection con setAutoCommit(false)):
-     *  1. Cargo al origen con SQL_CARGO (descuenta solo si alcanza el saldo).
-     *     Si no afectó filas: OperacionRechazadaException
-     *     "La cuenta <n> no existe." o "Saldo insuficiente en la cuenta <n>."
-     *  2. Abono al destino con SQL_ABONO. Si no afectó filas:
-     *     OperacionRechazadaException("La cuenta <n> no existe.")
-     *  3. Registra dos movimientos con SQL_MOVIMIENTO (CARGO en el origen y
-     *     ABONO en el destino), con la misma fecha y hora y la glosa recibida.
-     *  4. commit().
-     * Ante cualquier excepción (de negocio o SQLException): rollback() y relanzarla.
+     * Transfiere un monto entre dos cuentas como UNA transacción: o se hacen
+     * los cuatro cambios (cargo, abono y dos movimientos), o ninguno.
      */
     public void transferir(String origen, String destino, long monto, String glosa)
             throws SQLException, OperacionRechazadaException {
-        throw new UnsupportedOperationException("TODO R1 a R3");
+        if (monto <= 0) {
+            throw new IllegalArgumentException("El monto debe ser mayor que cero.");
+        }
+        if (origen.equals(destino)) {
+            throw new IllegalArgumentException("La cuenta de origen y la de destino deben ser distintas.");
+        }
+        // Todas las sentencias de una transacción usan la MISMA conexión.
+        try (Connection con = conexion.abrir()) {
+            con.setAutoCommit(false);
+            try (PreparedStatement cargo = con.prepareStatement(SQL_CARGO);
+                 PreparedStatement abono = con.prepareStatement(SQL_ABONO);
+                 PreparedStatement movimiento = con.prepareStatement(SQL_MOVIMIENTO)) {
+                cargar(con, cargo, origen, monto);
+                abonar(abono, destino, monto);
+
+                LocalDateTime ahora = LocalDateTime.now().withNano(0);
+                registrar(movimiento, origen, ahora, Movimiento.CARGO, monto, glosa);
+                movimiento.executeUpdate();
+                registrar(movimiento, destino, ahora, Movimiento.ABONO, monto, glosa);
+                movimiento.executeUpdate();
+
+                con.commit();
+            } catch (SQLException | OperacionRechazadaException | RuntimeException e) {
+                con.rollback(); // deshace todo lo ejecutado desde setAutoCommit(false)
+                throw e;
+            }
+        }
     }
 
     /**
-     * TODO R4: paga las remuneraciones desde la cuenta de la empresa, TODO O NADA.
-     *  - pagos: número de cuenta → monto. Vacío o con montos <= 0: IllegalArgumentException.
-     *  - Un solo cargo a la empresa por el total (si no alcanza:
-     *    OperacionRechazadaException("Saldo insuficiente en la cuenta <n>.")).
-     *  - Los abonos y sus movimientos se envían en LOTE (addBatch/executeBatch).
-     *    Si algún abono no afectó filas (cuenta inexistente):
-     *    OperacionRechazadaException("La cuenta <n> no existe.").
-     *  - Movimientos: un CARGO a la empresa con glosa "Remuneraciones (<cantidad> pagos)"
-     *    y un ABONO por trabajador con la glosa recibida.
-     *  - Retorna el total pagado.
+     * Paga las remuneraciones desde la cuenta de la empresa, todo o nada.
+     * Retorna el total pagado.
      */
     public long pagarRemuneraciones(String cuentaEmpresa, Map<String, Long> pagos, String glosa)
             throws SQLException, OperacionRechazadaException {
-        throw new UnsupportedOperationException("TODO R4");
+        if (pagos.isEmpty()) {
+            throw new IllegalArgumentException("No hay pagos que realizar.");
+        }
+        // Se fija un orden para recorrer los pagos y para leer los resultados del lote.
+        List<Map.Entry<String, Long>> lista = new ArrayList<>(pagos.entrySet());
+        long total = 0;
+        for (Map.Entry<String, Long> pago : lista) {
+            if (pago.getValue() <= 0) {
+                throw new IllegalArgumentException("El pago a la cuenta " + pago.getKey() + " debe ser mayor que cero.");
+            }
+            total += pago.getValue();
+        }
+
+        try (Connection con = conexion.abrir()) {
+            con.setAutoCommit(false);
+            try (PreparedStatement cargo = con.prepareStatement(SQL_CARGO);
+                 PreparedStatement abono = con.prepareStatement(SQL_ABONO);
+                 PreparedStatement movimiento = con.prepareStatement(SQL_MOVIMIENTO)) {
+                cargar(con, cargo, cuentaEmpresa, total);
+
+                // Lote: los abonos se acumulan y viajan juntos al servidor.
+                for (Map.Entry<String, Long> pago : lista) {
+                    abono.setLong(1, pago.getValue());
+                    abono.setString(2, pago.getKey());
+                    abono.addBatch();
+                }
+                int[] filas = abono.executeBatch(); // filas afectadas por cada sentencia, en orden
+                for (int i = 0; i < filas.length; i++) {
+                    if (filas[i] == 0) {
+                        throw new OperacionRechazadaException("La cuenta " + lista.get(i).getKey() + " no existe.");
+                    }
+                }
+
+                LocalDateTime ahora = LocalDateTime.now().withNano(0);
+                registrar(movimiento, cuentaEmpresa, ahora, Movimiento.CARGO, total,
+                        "Remuneraciones (" + lista.size() + " pagos)");
+                movimiento.addBatch();
+                for (Map.Entry<String, Long> pago : lista) {
+                    registrar(movimiento, pago.getKey(), ahora, Movimiento.ABONO, pago.getValue(), glosa);
+                    movimiento.addBatch();
+                }
+                movimiento.executeBatch();
+
+                con.commit();
+                return total;
+            } catch (SQLException | OperacionRechazadaException | RuntimeException e) {
+                con.rollback();
+                throw e;
+            }
+        }
+    }
+
+    /** Descuenta el monto solo si alcanza el saldo; si no, explica por qué. */
+    private void cargar(Connection con, PreparedStatement cargo, String numero, long monto)
+            throws SQLException, OperacionRechazadaException {
+        cargo.setLong(1, monto);
+        cargo.setString(2, numero);
+        cargo.setLong(3, monto);
+        if (cargo.executeUpdate() == 0) {
+            throw new OperacionRechazadaException(existe(con, numero)
+                    ? "Saldo insuficiente en la cuenta " + numero + "."
+                    : "La cuenta " + numero + " no existe.");
+        }
+    }
+
+    private void abonar(PreparedStatement abono, String numero, long monto)
+            throws SQLException, OperacionRechazadaException {
+        abono.setLong(1, monto);
+        abono.setString(2, numero);
+        if (abono.executeUpdate() == 0) {
+            throw new OperacionRechazadaException("La cuenta " + numero + " no existe.");
+        }
+    }
+
+    private void registrar(PreparedStatement movimiento, String numero, LocalDateTime fechaHora,
+                           String tipo, long monto, String glosa) throws SQLException {
+        movimiento.setString(1, numero);
+        movimiento.setObject(2, fechaHora);
+        movimiento.setString(3, tipo);
+        movimiento.setLong(4, monto);
+        movimiento.setString(5, glosa);
+    }
+
+    /** Usa la conexión de la transacción en curso. */
+    private boolean existe(Connection con, String numero) throws SQLException {
+        try (PreparedStatement ps = con.prepareStatement("SELECT 1 FROM cuenta WHERE numero = ?")) {
+            ps.setString(1, numero);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
     }
 }

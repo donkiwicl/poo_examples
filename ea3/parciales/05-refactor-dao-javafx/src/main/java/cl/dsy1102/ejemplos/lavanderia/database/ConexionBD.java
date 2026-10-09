@@ -1,4 +1,4 @@
-package cl.dsy1102.ejemplos.conexion;
+package cl.dsy1102.ejemplos.lavanderia.database;
 
 import java.io.IOException;
 import java.io.InputStream;
