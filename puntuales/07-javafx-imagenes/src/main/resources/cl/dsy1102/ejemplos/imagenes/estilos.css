@@ -1,0 +1,26 @@
+.vista {
+    -fx-padding: 20;
+    -fx-background-color: #f4f7f2;
+    -fx-font-size: 13px;
+}
+
+.titulo {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #285e3c;
+}
+
+.subtitulo {
+    -fx-text-fill: #5b5b5b;
+}
+
+.nombre {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.marco {
+    -fx-background-color: white;
+    -fx-border-color: #d5dcd0;
+    -fx-padding: 10;
+}

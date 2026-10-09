@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cl.dsy1102.ejemplos.imagenes.ParquesController"
+            stylesheets="@estilos.css" styleClass="vista">
+    <top>
+        <VBox spacing="4">
+            <Label text="Parques Nacionales de Chile" styleClass="titulo"/>
+            <Label text="Catálogo ilustrado · CONAF" styleClass="subtitulo"/>
+            <BorderPane.margin><Insets bottom="14"/></BorderPane.margin>
+        </VBox>
+    </top>
+
+    <left>
+        <ListView fx:id="lstParques" prefWidth="250">
+            <BorderPane.margin><Insets right="14"/></BorderPane.margin>
+        </ListView>
+    </left>
+
+    <center>
+        <VBox spacing="10">
+            <!-- minWidth/minHeight 0: permite que el marco se achique y la imagen se ajuste. -->
+            <StackPane fx:id="marcoImagen" styleClass="marco" minWidth="0" minHeight="0" VBox.vgrow="ALWAYS">
+                <ImageView fx:id="imgParque"/>
+                <ProgressIndicator fx:id="prgCarga" visible="false" maxWidth="60" maxHeight="60"/>
+            </StackPane>
+            <Label fx:id="lblNombre" styleClass="nombre"/>
+            <Label fx:id="lblRegion" styleClass="subtitulo"/>
+            <Label fx:id="lblDescripcion" wrapText="true"/>
+            <HBox spacing="8">
+                <Button fx:id="btnCargar" text="Cargar imagen propia…" onAction="#onCargar"/>
+                <Button fx:id="btnRestaurar" text="Restaurar" onAction="#onRestaurar"/>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>
