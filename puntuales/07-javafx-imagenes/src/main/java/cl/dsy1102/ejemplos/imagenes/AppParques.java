@@ -3,6 +3,7 @@ package cl.dsy1102.ejemplos.imagenes;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -19,7 +20,8 @@ public class AppParques extends Application {
         stage.setTitle("Parques Nacionales de Chile");
         stage.setMinWidth(720);
         stage.setMinHeight(480);
-        // TODO R6: usa img/icono.png como icono de la ventana (stage.getIcons()).
+        // Icono de la ventana y de la barra de tareas. Se pueden agregar varios tamanos.
+        stage.getIcons().add(new Image(AppParques.class.getResource("img/icono.png").toExternalForm()));
         stage.show();
     }
 
